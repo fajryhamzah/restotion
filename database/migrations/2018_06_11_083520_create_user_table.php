@@ -20,7 +20,7 @@ class CreateUserTable extends Migration
             $table->string("email",100);
             $table->string("name",60);
             $table->string("verifyHash",40);
-            $table->boolean("verified");
+            $table->boolean("verified")->default(false);
             $table->date("joined");
             $table->softDeletes();
 

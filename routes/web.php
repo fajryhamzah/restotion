@@ -14,3 +14,19 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+//register
+Route::get('/register',function (){
+    return view("register");
+});
+
+//Login
+Route::get('/login',function(){
+    return view("login");
+});
+
+
+//register handling
+Route::post('/register','DashboardController@register');
+//login handling
+Route::post('/login','DashboardController@login');
