@@ -6,6 +6,7 @@ use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\User;
+use Mail;
 
 class DashboardController extends Controller
 {
@@ -24,7 +25,7 @@ class DashboardController extends Controller
     $validator = \Validator::make($r->all(), $rules);
 
     if($validator->fails()){
-        return \Redirect::back()->with(["error" => $validator->errors()]);
+        return \Redirect::back()->withInput()->with(["error" => $validator->errors()]);
     }
 
     if($r->input("password") != $r->input("password1")){
@@ -53,6 +54,14 @@ class DashboardController extends Controller
 
     try{
       $insert->save();
+
+      //send Email
+      $data = array('name'=>$name,'hash'=>$insert->verifyHash);
+      Mail::send(['html'=>'confirm'], $data, function($message) use($email,$username) {
+           $message->to($email, $username)->subject
+              ('Konfirmasi akun anda');
+           $message->from('blast@restotion.com','Restotion Bot');
+        });
 
       return view('register_success');
     }
@@ -88,6 +97,21 @@ class DashboardController extends Controller
     else{
       return \Redirect::back()->withInput()->with(["error" => "Username dan password tidak cocok."]);
     }
+  }
+
+  //konfirmasi Email
+  public function konfirmasi($hash){
+    $data = User::where("verifyHash",$hash)->first();
+
+    if( (!$data) || ($data->verified == 1) ){
+      return 404;
+    }
+
+    $data->verified = 1;
+
+    $data->save();
+
+    return view("confirmCongrats");
   }
 
 

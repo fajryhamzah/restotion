@@ -25,8 +25,23 @@ Route::get('/login',function(){
     return view("login");
 });
 
+//Dashboard
+Route::get('/dashboard',function(){
+    return view("dashboard");
+});
+
+//add restaurant form
+Route::get("/add_restaurant",function(){
+    return view("restaurant/add");
+});
+
+//konfirmasi Email
+Route::get("/konfirmasi/{hash}","DashboardController@konfirmasi");
+
 
 //register handling
 Route::post('/register','DashboardController@register');
 //login handling
 Route::post('/login','DashboardController@login');
+//add restaurant data
+Route::post('/add_restaurant','RestoranController@addRestoran');
