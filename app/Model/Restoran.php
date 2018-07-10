@@ -12,5 +12,5 @@ class Restoran extends Model
   protected $table = 'restoran';
 	public $timestamps = false;
 	protected $primaryKey = 'id_restoran';
-	protected $fillable = ['nama_restoran','detail_restoran','latitude','longitude','logo','id_owner'];
+	protected $fillable = ['nama_restoran','detail_restoran','latitude','longitude','id_owner'];
 }

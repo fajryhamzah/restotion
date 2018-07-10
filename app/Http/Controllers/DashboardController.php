@@ -6,11 +6,11 @@ use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Model\User;
+use App\Model\Restoran;
 use Mail;
 
 class DashboardController extends Controller
 {
-
 
   //handling registration
   public function register(Request $r){
@@ -92,7 +92,12 @@ class DashboardController extends Controller
     })->where("password",$pass)->first();
 
     if($data){
-      return \Redirect::to(url('\dashboard'));
+
+      \Session::put("id",$data->id);
+      \Session::put("uname",$data->username);
+      \Session::put("name",$data->name);
+
+      return \Redirect::to(url('dashboard'));
     }
     else{
       return \Redirect::back()->withInput()->with(["error" => "Username dan password tidak cocok."]);
@@ -114,6 +119,26 @@ class DashboardController extends Controller
     return view("confirmCongrats");
   }
 
+  //logout
+  public function logout(){
+    \Session::flush();
 
+    return \Redirect::to(url("login"));
+  }
+
+  //interface dashboard
+  public function dashboardInterface(){
+    $data = Restoran::select("id_restoran as id",'nama_restoran','id_owner')->where("id_owner",\Session::get("id"))->get();
+
+    $data = $data->map(function($item){
+        $hash = md5($item->id);
+        $logo_path = public_path()."/restoran/".$hash."/";
+        $item->logo = (file_exists($logo_path."logo.png"))? asset("restoran/".$hash."/logo.png"):asset("/default.png");
+        return $item;
+    });
+
+    $item['data'] = $data;
+    return view("dashboard",$item);
+  }
 
 }

@@ -53,11 +53,10 @@
         font-weight: 300;
       }
 </style>
-
 <form method="post" enctype="multipart/form-data">
   {{ \Session::get('error') }}
   Nama Restoran : <input type="text" name="nama" value="{{old('nama')}}" required/><br />
-  Detail Restoran : <textarea name="detail"></textarea><br />
+  Detail Restoran : <textarea name="detail">{{old('detail')}}</textarea><br />
   Logo : <input type="file" name="logo" />
   Upload Image : <input type="file" name="image[]"  multiple/>
   Lokasi :
