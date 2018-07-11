@@ -59,6 +59,18 @@
   Detail Restoran : <textarea name="detail">{{old('detail')}}</textarea><br />
   Logo : <input type="file" name="logo" />
   Upload Image : <input type="file" name="image[]"  multiple/>
+  Jam Buka : <input type="text" name="jam_buka">
+  Jam Tutup : <input type="text" name="jam_tutup">
+  Hari Buka:
+  <select name="hari[]" multiple>
+    <option value="1">Senin</option>
+    <option value="2">Selasa</option>
+    <option value="3">Rabu</option>
+    <option value="4">Kamis</option>
+    <option value="5">Jumat</option>
+    <option value="6">Sabtu</option>
+    <option value="7">Minggu</option>
+  </select>
   Lokasi :
   <input id="pac-input" class="controls" type="text" placeholder="Cari lokasi restoran anda">
   <div id="map">

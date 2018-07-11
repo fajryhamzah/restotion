@@ -44,6 +44,10 @@ Route::group(['middleware' => 'pass'], function () {
       return view("restaurant/add");
   });
 
+  //edit account
+  Route::get('/setting','DashboardController@settingInterface');
+  Route::post('/setting','DashboardController@settingSave');
+
   //add restaurant data
   Route::post('/add_restaurant','RestoranController@addRestoran');
   //logout

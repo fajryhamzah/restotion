@@ -1,5 +1,6 @@
 Dashboard:
 <a href="{{ url("/add_restaurant") }}">Tambah restoran</a>
+<a href="{{ url("/setting") }}">Edit akun</a>
 <a href="{{ url("/logout") }}">Log out</a>
 
 <table border="1">

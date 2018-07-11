@@ -19,6 +19,8 @@ class CreateRestoranTable extends Migration
             $table->text("detail_restoran");
             $table->decimal("latitude",10,8);
             $table->decimal("longitude",11,8);
+            $table->time("jam_buka");
+            $table->time("jam_tutup");
             $table->integer("id_owner")->unsigned();
             $table->foreign('id_owner')->references("id")->on("user");
         });

@@ -126,6 +126,43 @@ class DashboardController extends Controller
     return \Redirect::to(url("login"));
   }
 
+  //handling form save
+  public function settingSave(Request $r){
+    $rules = array(
+      "name" => "required",
+      "email" => "required|email"
+    );
+
+    $validator = \Validator::make($r->all(),$rules);
+
+    if($validator->fails()){
+      return \Redirect::back()->withInput()->with(['error' => $validator->errors()]);
+    }
+
+    //check Email
+    $check_email = User::where("email",$r->input("email"))->where("id","!=",\Session::get("id"))->first();
+
+    //email has been taken by someone else
+    if($check_email){
+      return \Redirect::back()->with(["error" => "Email telah ada di pakai"]);
+    }
+
+    $profile = User::find(\Session::get("id"));
+    $profile->email = $r->input("email");
+    $profile->name = $r->input("name");
+
+    try{
+      $profile->save();
+
+      return \Redirect::to(url('setting'))->with(['success' => 'Sukses diubah']);
+    }
+    catch(\Exception $e){
+      return \Redirect::to(url('setting'))->withInput()->with(['error' => $e->getMessage()]);
+    }
+  }
+
+  //INTERFACE
+
   //interface dashboard
   public function dashboardInterface(){
     $data = Restoran::select("id_restoran as id",'nama_restoran','id_owner')->where("id_owner",\Session::get("id"))->get();
@@ -139,6 +176,13 @@ class DashboardController extends Controller
 
     $item['data'] = $data;
     return view("dashboard",$item);
+  }
+
+  //interface setting
+  public function settingInterface(){
+    $data['profile'] = User::select("email","name")->find(\Session::get("id"));
+
+    return view("profile/setting",$data);
   }
 
 }

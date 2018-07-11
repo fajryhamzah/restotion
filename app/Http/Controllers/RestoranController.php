@@ -18,6 +18,9 @@ class RestoranController extends Controller
         'detail' => 'required|min:4',
         'logo' => 'required|file',
         'image.*' => 'file|mimes:jpg,jpeg,png,bmp|max:1000',
+        'jam_buka' => 'required|date_format:"H:i"|before:jam_tutup',
+        'jam_tutup' => 'required|date_format:"H:i"',
+        'hari.*' => 'required|min:1|max:7',
         'lat' => 'required',
         'lng' => 'required',
     );
@@ -36,11 +39,17 @@ class RestoranController extends Controller
     $logo = $r->file("logo");
     $images = $r->file("image");
     $lat = $r->input("lat");
+    $buka = $r->input("jam_buka");
+    $tutup = $r->input("jam_tutup");
+    $hari = $r->input("hari");
     $lng = $r->input("lng");
 
     $newResto = new Restoran;
     $newResto->nama_restoran = $nama;
     $newResto->detail_restoran = $detail;
+    $newResto->jam_buka = $buka;
+    $newResto->jam_tutup = $tutup;
+    $newResto->hari = json_encode($r->hari);
     $newResto->latitude = $lat;
     $newResto->longitude = $lng;
     $newResto->id_owner = \Session::get("id");
