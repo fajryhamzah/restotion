@@ -84,13 +84,29 @@ class RestoranController extends Controller
     catch(\Exception $e){
       dd($e->getMessage());
     }
+  }
 
+  /* INTERFACE */
+  public function addRestoranInterface(){
+    return view("restaurant/add");
+  }
 
+  public function dashboardRestoranInterface(){
+    return view("restaurant/dashboard");
+  }
 
+  public function dashboardInsideRestoranInterface($id){
+    $data['info'] = Restoran::find($id);
 
+    if(!$data['info']){
+      return \Redirect::to(url("dashboard"))->with(['error' => "Not Found"]);
+    }
 
+    if($data['info']->id_owner != \Session::get("id")){
+      return \Redirect::to(url("dashboard"))->with(['error' => "Not Authorized"]);
+    }
 
-
+    return view("restaurant/insideDashboard",$data);
   }
 
 }

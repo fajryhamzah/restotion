@@ -163,6 +163,16 @@ class DashboardController extends Controller
 
   //INTERFACE
 
+  //interface register
+  public function registerInterface(){
+    return view("register");
+  }
+
+  //interface login
+  public function loginInterface(){
+    return view("login");
+  }
+
   //interface dashboard
   public function dashboardInterface(){
     $data = Restoran::select("id_restoran as id",'nama_restoran','id_owner')->where("id_owner",\Session::get("id"))->get();

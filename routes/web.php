@@ -14,42 +14,40 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
 //WHEN USER HAS NOT LOGIN
 Route::group(['middleware' => 'notpass'], function () {
   //konfirmasi Email
-  Route::get("/konfirmasi/{hash}","DashboardController@konfirmasi");
+  Route::get("konfirmasi/{hash}","DashboardController@konfirmasi");
   //register
-  Route::get('/register',function (){
-      return view("register");
-  });
+  Route::get('register',"DashboardController@registerInterface");
   //Login
-  Route::get('/login',function(){
-      return view("login");
-  });
-
+  Route::get('login',"DashboardController@loginInterface");
   //register handling
-  Route::post('/register','DashboardController@register');
+  Route::post('register','DashboardController@register');
   //login handling
-  Route::post('/login','DashboardController@login');
-
+  Route::post('login','DashboardController@login');
 });
+
 
 //WHEN USER HAS LOGIN
 Route::group(['middleware' => 'pass'], function () {
   //Dashboard
-  Route::get('/dashboard',"DashboardController@dashboardInterface");
+  Route::get('dashboard',"DashboardController@dashboardInterface");
+
+  //Dashboard Inside Restaurant
+  Route::get("dashboard/{id}","RestoranController@dashboardInsideRestoranInterface");
 
   //add restaurant form
-  Route::get("/add_restaurant",function(){
-      return view("restaurant/add");
-  });
+  Route::get("add_restaurant","RestoranController@addRestoranInterface");
 
   //edit account
-  Route::get('/setting','DashboardController@settingInterface');
-  Route::post('/setting','DashboardController@settingSave');
+  Route::get('setting','DashboardController@settingInterface');
+  Route::post('setting','DashboardController@settingSave');
 
   //add restaurant data
-  Route::post('/add_restaurant','RestoranController@addRestoran');
+  Route::post('add_restaurant','RestoranController@addRestoran');
+
   //logout
-  Route::get("/logout","DashboardController@logout");
+  Route::get("logout","DashboardController@logout");
 });
