@@ -34,7 +34,7 @@ class DashboardController extends Controller
 
     $email = $r->input("email");
     $username = $r->input("username");
-    $password = md5($r->input("password"));
+    $password = sha1($r->input("password"));
     $name = $r->input("name");
 
     $find = User::where("username",$username)->orWhere("email",$email)->first();
@@ -85,7 +85,7 @@ class DashboardController extends Controller
     }
 
     $uname = $r->input("uname");
-    $pass = md5($r->input("password"));
+    $pass = sha1($r->input("password"));
 
     $data = User::where(function($q) use($uname){
       $q->where("email",$uname)->orWhere("username",$uname);

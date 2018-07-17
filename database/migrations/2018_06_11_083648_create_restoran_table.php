@@ -21,6 +21,7 @@ class CreateRestoranTable extends Migration
             $table->decimal("longitude",11,8);
             $table->time("jam_buka");
             $table->time("jam_tutup");
+            $table->softDeletes();
             $table->integer("id_owner")->unsigned();
             $table->foreign('id_owner')->references("id")->on("user");
         });
