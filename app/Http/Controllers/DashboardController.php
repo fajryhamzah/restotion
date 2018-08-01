@@ -25,7 +25,7 @@ class DashboardController extends Controller
     $validator = \Validator::make($r->all(), $rules);
 
     if($validator->fails()){
-        return \Redirect::back()->withInput()->with(["error" => $validator->errors()]);
+        return \Redirect::back()->withInput()->with(["error" => implode("<br />",$validator->errors()->all() )]);
     }
 
     if($r->input("password") != $r->input("password1")){
@@ -62,11 +62,11 @@ class DashboardController extends Controller
               ('Konfirmasi akun anda');
            $message->from('blast@restotion.com','Restotion Bot');
         });
-
-      return view('register_success');
+      $data['page'] = "login";
+      return view('register_success',$data);
     }
     catch(\Exception $e){
-        return \Redirect::back()->withInput()->with(["error" => "Terjadi kesalahan pada database."]);
+        return \Redirect::back()->withInput()->with(["error" => "Terjadi kesalahan pada database. : "]);
     }
 
   }
@@ -81,7 +81,7 @@ class DashboardController extends Controller
     $validator = \Validator::make($r->all(), $rules);
 
     if($validator->fails()){
-      return \Redirect::back()->withInput()->with(["error" => $validator->errors()]);
+      return \Redirect::back()->withInput()->with(["error" => implode("<br />",$validator->errors()->all() ) ]);
     }
 
     $uname = $r->input("uname");
@@ -89,7 +89,7 @@ class DashboardController extends Controller
 
     $data = User::where(function($q) use($uname){
       $q->where("email",$uname)->orWhere("username",$uname);
-    })->where("password",$pass)->first();
+    })->where("password",$pass)->where("verified",1)->first();
 
     if($data){
 
@@ -100,7 +100,7 @@ class DashboardController extends Controller
       return \Redirect::to(url('dashboard'));
     }
     else{
-      return \Redirect::back()->withInput()->with(["error" => "Username dan password tidak cocok."]);
+      return \Redirect::back()->withInput()->with(["error" => "Username dan password tidak cocok atau akun belum di verifikasi."]);
     }
   }
 
@@ -115,8 +115,8 @@ class DashboardController extends Controller
     $data->verified = 1;
 
     $data->save();
-
-    return view("confirmCongrats");
+    $a['page'] = "login";
+    return view("confirmCongrats",$a);
   }
 
   //logout
@@ -128,10 +128,24 @@ class DashboardController extends Controller
 
   //handling form save
   public function settingSave(Request $r){
-    $rules = array(
-      "name" => "required",
-      "email" => "required|email"
-    );
+    $cek = $r->input("display");
+
+    if($cek == 1){
+      $rules = array(
+        "name" => "required",
+        "email" => "required|email"
+      );
+    }
+    else if($cek == 0){
+      $rules = array(
+        "passwordlama" => "required",
+        "passwordbaru" => "required",
+        "passwordbarukonf" => "required"
+      );
+    }
+    else{
+      return \Redirect::back()->withInput()->with(['error' => "Invalid"]);
+    }
 
     $validator = \Validator::make($r->all(),$rules);
 
@@ -139,25 +153,52 @@ class DashboardController extends Controller
       return \Redirect::back()->withInput()->with(['error' => $validator->errors()]);
     }
 
-    //check Email
-    $check_email = User::where("email",$r->input("email"))->where("id","!=",\Session::get("id"))->first();
 
-    //email has been taken by someone else
-    if($check_email){
-      return \Redirect::back()->with(["error" => "Email telah ada di pakai"]);
+    if($cek == 1){
+      //check Email
+      $check_email = User::where("email",$r->input("email"))->where("id","!=",\Session::get("id"))->first();
+
+      //email has been taken by someone else
+      if($check_email){
+        return \Redirect::back()->with(["error" => "Email telah ada di pakai"]);
+      }
+
+      $profile = User::find(\Session::get("id"));
+      $profile->email = $r->input("email");
+      $profile->name = $r->input("name");
+
+      try{
+        $profile->save();
+
+        return \Redirect::to(url('setting'))->with(['success' => 'Sukses diubah']);
+      }
+      catch(\Exception $e){
+        return \Redirect::to(url('setting'))->withInput()->with(['error' => $e->getMessage()]);
+      }
     }
+    else{
 
-    $profile = User::find(\Session::get("id"));
-    $profile->email = $r->input("email");
-    $profile->name = $r->input("name");
+      if($r->input("passwordbaru") != $r->input("passwordbarukonf")){
+        return \Redirect::back()->withInput()->with(['error' => "Password baru tidak sama"]);
+      }
 
-    try{
-      $profile->save();
+      $check = User::find(\Session::get("id"));
 
-      return \Redirect::to(url('setting'))->with(['success' => 'Sukses diubah']);
-    }
-    catch(\Exception $e){
-      return \Redirect::to(url('setting'))->withInput()->with(['error' => $e->getMessage()]);
+      if($check->password != sha1($r->input("passwordlama"))){
+        return \Redirect::back()->withInput()->with(['error' => "Password tidak sama"]);
+      }
+
+      $check->password = sha1($r->input("passwordbaru"));
+
+      try{
+        $check->save();
+
+        return \Redirect::to(url('setting'))->with(['success' => 'Sukses ganti password']);
+      }
+      catch(\Exception $e){
+        return \Redirect::to(url('setting'))->withInput()->with(['error' => $e->getMessage()]);
+      }
+
     }
   }
 
@@ -165,12 +206,14 @@ class DashboardController extends Controller
 
   //interface register
   public function registerInterface(){
-    return view("register");
+    $data['page'] = "login";
+    return view("register",$data);
   }
 
   //interface login
   public function loginInterface(){
-    return view("login");
+    $data['page'] = "login";
+    return view("login",$data);
   }
 
   //interface dashboard
@@ -191,7 +234,7 @@ class DashboardController extends Controller
   //interface setting
   public function settingInterface(){
     $data['profile'] = User::select("email","name")->find(\Session::get("id"));
-
+    $data['hal'] = 1;
     return view("profile/setting",$data);
   }
 
